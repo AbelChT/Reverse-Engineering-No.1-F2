@@ -1,0 +1,2 @@
+rootProject.name='N0.1 F2 Smartwatch Companion'
+include ':app'
