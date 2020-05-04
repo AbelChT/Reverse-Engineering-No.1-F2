@@ -5,4 +5,5 @@ object DeviceInfo {
 
     @ExperimentalUnsignedTypes
     val SmartWatchConfigurationPackage: Array<UByte> = arrayOf(0x00u, 0x00u)
+
 }
