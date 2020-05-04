@@ -12,3 +12,4 @@
 /captures
 .externalNativeBuild
 .cxx
+/app/src/main/java/com/abelcht/n01f2smwc/smartwatch/config/DeviceInfo.kt
