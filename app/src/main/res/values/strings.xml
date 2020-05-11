@@ -9,5 +9,6 @@
     <string name="set_alarm">Set alarm</string>
     <string name="enable_action">Enable Action</string>
     <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
     <string name="find_device">Find device</string>
 </resources>

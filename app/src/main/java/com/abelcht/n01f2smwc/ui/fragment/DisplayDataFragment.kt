@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.activityViewModels
 import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
@@ -34,80 +35,6 @@ class DisplayDataFragment : Fragment() {
     val SELECT_DEVICE_REQUEST_CODE = 43
     val REQUEST_ENABLE_BT = 41
     private val TAG = "MainActivity"
-    var connectedDevice = false
-    var bluetoothGatt: BluetoothGatt? = null
-    var smartWatchWriteCharacteristicGlobal: BluetoothGattCharacteristic? = null
-
-    private val bluetoothGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            super.onConnectionStateChange(gatt, status, newState)
-            // Log.i(TAG, "Connection change")
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                connectedDevice = BluetoothGatt.STATE_CONNECTED == newState
-//                Log.i(TAG, "Connection change effective, state $connectedDevice")
-                if (connectedDevice) {
-                    Log.i(TAG, "Connected")
-                    // Discover services
-                    gatt!!.discoverServices()
-                }
-            }
-        }
-
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-//            Log.i(TAG, "Service discovered")
-//            gatt!!.services.forEach({
-//                Log.i(TAG, "Service UUID ${it.uuid}")
-//                it.characteristics.forEach {
-//                    Log.i(TAG, "\t Characteristic UUID ${it.uuid}")
-//                    Log.i(TAG, "\t\t Permissions ${it.permissions}")
-//                    Log.i(TAG, "\t\t Properties ${it.properties}")
-//                }
-//            })
-            val smartWatchMainService =
-                gatt!!.getService(UUID.fromString("c3e6fea0-e966-1000-8000-be99c223df6a"))
-            if (smartWatchMainService != null) {
-                // Characteristic write c3e6fea1-e966-1000-8000-be99c223df6a
-                // Characteristic notification c3e6fea2-e966-1000-8000-be99c223df6a
-                val smartWatchWriteCharacteristic =
-                    smartWatchMainService.getCharacteristic(UUID.fromString("c3e6fea1-e966-1000-8000-be99c223df6a"))
-                val smartWatchNotificationCharacteristic =
-                    smartWatchMainService.getCharacteristic(UUID.fromString("c3e6fea2-e966-1000-8000-be99c223df6a"))
-                if (smartWatchWriteCharacteristic != null && smartWatchNotificationCharacteristic != null) {
-                    Log.i(TAG, "Characteristics catch successfully")
-                    smartWatchWriteCharacteristicGlobal = smartWatchWriteCharacteristic
-                    smartWatchWriteCharacteristicGlobal!!.value = byteArrayOf(
-                        0xa9.toByte(),
-                        0x32.toByte(),
-                        0x00.toByte(),
-                        0x0c.toByte(),
-                        0x40.toByte(),
-                        0xe2.toByte(),
-                        0x01.toByte(),
-                        0x00.toByte(),
-                        0x00.toByte(),
-                        0x00.toByte(),
-                        0xa9.toByte(),
-                        0xbc.toByte(),
-                        0x7a.toByte(),
-                        0x8e.toByte(),
-                        0xf0.toByte(),
-                        0xad.toByte(),
-                        0x14.toByte()
-                    )
-
-                    var characteristicWriteReturn =
-                        bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristicGlobal)
-
-                    Log.i(TAG, "Sent first value $characteristicWriteReturn")
-                } else {
-                    Log.i(TAG, "Error on characteristics catch")
-                }
-            } else {
-                Log.i(TAG, "Error on service catch")
-            }
-        }
-    }
 
     private val deviceManager: CompanionDeviceManager by lazy(LazyThreadSafetyMode.NONE) {
         requireActivity().getSystemService(CompanionDeviceManager::class.java)
@@ -115,6 +42,8 @@ class DisplayDataFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        // TODO: Add callback to bluetooth disconnect
 
         // TODO: Request bluetooth and location
 
@@ -132,11 +61,10 @@ class DisplayDataFragment : Fragment() {
             .setSingleDevice(false)
             .build()
 
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+
 
         connectionButton.setOnClickListener {
-            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-
-
             if (bluetoothAdapter?.isEnabled == false) {
                 val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
@@ -144,30 +72,70 @@ class DisplayDataFragment : Fragment() {
 
             // Check if location is enabled
             if (bluetoothAdapter?.isEnabled == true) {
-                // When the app tries to pair with the Bluetooth device, show the
-                // appropriate pairing request dialog to the user.
-                deviceManager.associate(
-                    pairingRequest,
-                    object : CompanionDeviceManager.Callback() {
 
-                        override fun onDeviceFound(chooserLauncher: IntentSender) {
-                            startIntentSenderForResult(
-                                chooserLauncher,
-                                SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0, null
-                            )
-                        }
+                if (!viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
+                    // When the app tries to pair with the Bluetooth device, show the
+                    // appropriate pairing request dialog to the user.
+                    deviceManager.associate(
+                        pairingRequest,
+                        object : CompanionDeviceManager.Callback() {
 
-                        override fun onFailure(error: CharSequence?) {
-                            // Handle failure
-                        }
-                    }, null
-                )
+                            override fun onDeviceFound(chooserLauncher: IntentSender) {
+                                startIntentSenderForResult(
+                                    chooserLauncher,
+                                    SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0, null
+                                )
+                            }
+
+                            override fun onFailure(error: CharSequence?) {
+                                // Handle failure
+                            }
+                        }, null
+                    )
+
+                    // Disable button
+                    connectionButton.isEnabled = false
+                } else {
+                    viewModel.smartWatchCommunicationAPI.disconnectFromSmartWatch()
+                    onSmartWatchDisconnected()
+                }
             }
-
         }
-
     }
 
+    /**
+     * Actions executed when the smart watch connect to the bluetooth
+     */
+    fun onSmartWatchConnected() {
+        // Change button signature
+        connectionButton.isEnabled = true
+        connectionButton.text = getString(R.string.disconnect)
+    }
+
+    /**
+     * Actions executed when the smart watch connect to the bluetooth fails
+     */
+    fun onSmartWatchFailConnection() {
+        // Enable button
+        connectionButton.isEnabled = true
+
+        // Show toast
+        val text = "Failed to connect"
+        val duration = Toast.LENGTH_SHORT
+
+        val toast = Toast.makeText(this.context, text, duration)
+        toast.show()
+    }
+
+    /**
+     * Actions executed when the smart watch disconnect from the bluetooth
+     */
+    fun onSmartWatchDisconnected() {
+        // Change button signature
+        connectionButton.text = getString(R.string.connect)
+    }
+
+    @ExperimentalUnsignedTypes
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -180,16 +148,20 @@ class DisplayDataFragment : Fragment() {
                             val deviceAddress = deviceToPair.address
                             Log.i(TAG, "Device address: $deviceAddress")
 
-                            bluetoothGatt =
-                                deviceToPair.connectGatt(this.context, false, bluetoothGattCallback)
+                            viewModel.smartWatchCommunicationAPI.connectToSmartWatch(
+                                deviceToPair,
+                                this.requireContext()
+                            )
+                                .thenAccept {
+                                    if (it) {
+                                        onSmartWatchConnected()
+                                    } else {
+                                        onSmartWatchFailConnection()
+                                    }
+                                }
+
                         } else println("Unrecognised type of device")
                     }
-                    // User has chosen to pair with the Bluetooth device.
-//                    val deviceToPair: BluetoothDevice =
-//                            data!!.getParcelableExtra(CompanionDeviceManager.EXTRA_DEVICE)
-//                    deviceToPair.createBond()
-//                    // ... Continue interacting with the paired device.
-
                 }
             }
         }
