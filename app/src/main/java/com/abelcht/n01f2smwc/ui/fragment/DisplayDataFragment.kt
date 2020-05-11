@@ -101,15 +101,31 @@ class DisplayDataFragment : Fragment() {
                 }
             }
         }
+
+        // Set buttons state
+        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch())
+            onSmartWatchConnected()
+        else
+            onSmartWatchDisconnected()
+
+        // Find button action
+        findButton.setOnClickListener {
+            val notificationResult = viewModel.smartWatchCommunicationAPI.sendSearchNotification()
+            Log.i(TAG, "Find button pushed, result: $notificationResult")
+        }
     }
 
     /**
      * Actions executed when the smart watch connect to the bluetooth
      */
     fun onSmartWatchConnected() {
-        // Change button signature
+        // Change button text and state
         connectionButton.isEnabled = true
         connectionButton.text = getString(R.string.disconnect)
+
+        alarmButton.isEnabled = true
+        actionButton.isEnabled = true
+        findButton.isEnabled = true
     }
 
     /**
@@ -133,6 +149,9 @@ class DisplayDataFragment : Fragment() {
     fun onSmartWatchDisconnected() {
         // Change button signature
         connectionButton.text = getString(R.string.connect)
+        alarmButton.isEnabled = false
+        actionButton.isEnabled = false
+        findButton.isEnabled = false
     }
 
     @ExperimentalUnsignedTypes
@@ -151,14 +170,14 @@ class DisplayDataFragment : Fragment() {
                             viewModel.smartWatchCommunicationAPI.connectToSmartWatch(
                                 deviceToPair,
                                 this.requireContext()
-                            )
-                                .thenAccept {
-                                    if (it) {
-                                        onSmartWatchConnected()
-                                    } else {
-                                        onSmartWatchFailConnection()
-                                    }
+                            ) {
+                                Log.i(TAG, "Updating UI")
+                                if (it) {
+                                    activity?.runOnUiThread { onSmartWatchConnected() }
+                                } else {
+                                    activity?.runOnUiThread { onSmartWatchFailConnection() }
                                 }
+                            }
 
                         } else println("Unrecognised type of device")
                     }

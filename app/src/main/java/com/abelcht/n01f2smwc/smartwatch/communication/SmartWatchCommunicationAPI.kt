@@ -7,8 +7,8 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.util.Log
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.ConfigurePackage
+import com.abelcht.n01f2smwc.smartwatch.communication.packages.SearchNotificationPackage
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 class SmartWatchCommunicationAPI {
     // Tag for the logs
@@ -18,17 +18,16 @@ class SmartWatchCommunicationAPI {
     private var isDeviceConnected = false
 
     // Connection callback
-    var connectionFuture: CompletableFuture<Boolean>? = null
+    private var onConnectionCompleteCallback: ((Boolean) -> Unit)? = null
 
     // Bluetooth Gatt
-    var bluetoothGatt: BluetoothGatt? = null
+    private var bluetoothGatt: BluetoothGatt? = null
 
     // Bluetooth Gatt Characteristics
-    var smartWatchWriteCharacteristic: BluetoothGattCharacteristic? = null
-    var smartWatchNotificationCharacteristic: BluetoothGattCharacteristic? = null
+    private var smartWatchWriteCharacteristic: BluetoothGattCharacteristic? = null
+    private var smartWatchNotificationCharacteristic: BluetoothGattCharacteristic? = null
 
     // Callback for bluetooth connection
-    @ExperimentalUnsignedTypes
     private val bluetoothGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
@@ -57,29 +56,36 @@ class SmartWatchCommunicationAPI {
                     smartWatchMainService.getCharacteristic(UUID.fromString("c3e6fea2-e966-1000-8000-be99c223df6a"))
                 if (smartWatchWriteCharacteristic != null && smartWatchNotificationCharacteristic != null) {
                     Log.i(logTag, "Characteristics catch successfully")
+                    onConnectionCompleteCallback?.invoke(true)
                 } else {
                     Log.i(logTag, "Error on characteristics catch")
+                    onConnectionCompleteCallback?.invoke(false)
                 }
 
                 // Send configure command
                 configureSmartWatch()
             } else {
                 Log.i(logTag, "Error on service catch")
+                onConnectionCompleteCallback?.invoke(false)
             }
         }
     }
 
-    @ExperimentalUnsignedTypes
+    /**
+     * Connect to the SmartWatch
+     */
     fun connectToSmartWatch(
         bluetoothDevice: BluetoothDevice,
-        context: Context
-    ): CompletableFuture<Boolean> {
-        connectionFuture = CompletableFuture<Boolean>()
+        context: Context,
+        onCompleteCallback: (Boolean) -> Unit
+    ) {
+        onConnectionCompleteCallback = onCompleteCallback
         bluetoothGatt = bluetoothDevice.connectGatt(context, false, bluetoothGattCallback)
-        return connectionFuture!!
     }
 
-    @ExperimentalUnsignedTypes
+    /**
+     * Configure SmartWatch
+     */
     private fun configureSmartWatch(): Boolean {
         return if (smartWatchWriteCharacteristic != null) {
             smartWatchWriteCharacteristic!!.value =
@@ -90,15 +96,33 @@ class SmartWatchCommunicationAPI {
         }
     }
 
+    /**
+     * Return true if SmartWatch is connected
+     */
     fun isConnectedToSmartWatch(): Boolean {
-        // TODO: Improve
         return isDeviceConnected
     }
 
+    /**
+     * Disconnect from SmartWatch
+     */
     fun disconnectFromSmartWatch() {
         isDeviceConnected = false
         if (bluetoothGatt != null) {
             bluetoothGatt!!.close()
+        }
+    }
+
+    /**
+     * Send search notification
+     */
+    fun sendSearchNotification(): Boolean {
+        return if (smartWatchWriteCharacteristic != null) {
+            smartWatchWriteCharacteristic!!.value =
+                SearchNotificationPackage().getPackage().toByteArray()
+            bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
+        } else {
+            false
         }
     }
 
