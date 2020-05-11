@@ -74,8 +74,8 @@ class SmartWatchCommunicationAPI {
         bluetoothDevice: BluetoothDevice,
         context: Context
     ): CompletableFuture<Boolean> {
-        bluetoothGatt = bluetoothDevice.connectGatt(context, false, bluetoothGattCallback)
         connectionFuture = CompletableFuture<Boolean>()
+        bluetoothGatt = bluetoothDevice.connectGatt(context, false, bluetoothGattCallback)
         return connectionFuture!!
     }
 
@@ -83,7 +83,7 @@ class SmartWatchCommunicationAPI {
     private fun configureSmartWatch(): Boolean {
         return if (smartWatchWriteCharacteristic != null) {
             smartWatchWriteCharacteristic!!.value =
-                ConfigurePackage().getPackage().map { it.toByte() }.toByteArray()
+                ConfigurePackage(bluetoothGatt!!.device.address!!).getPackage().toByteArray()
             bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
         } else {
             false
