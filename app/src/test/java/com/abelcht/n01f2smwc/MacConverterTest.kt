@@ -5,7 +5,7 @@ import org.junit.Test
 class MacConverterTest {
     @ExperimentalUnsignedTypes
     @Test
-    fun testsWork() {
+    fun testsConvertMac() {
         val macAddress = "12:a2:33:12:a2:33"
         val addressSpliced = (0..5).map {
             macAddress.subSequence(3 * it, 3 * it + 2).toString().toInt(16).toByte()
