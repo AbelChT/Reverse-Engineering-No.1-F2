@@ -19,5 +19,6 @@ class MainActivity : AppCompatActivity() {
         mainActivityToolbar.setupWithNavController(navController, appBarConfiguration)
 
         // TODO: Setup CALL, Message and change data and time callback set a
+
     }
 }

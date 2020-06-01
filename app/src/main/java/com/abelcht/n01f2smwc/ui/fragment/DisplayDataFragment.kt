@@ -1,5 +1,6 @@
 package com.abelcht.n01f2smwc.ui.fragment
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -7,6 +8,7 @@ import android.companion.AssociationRequest
 import android.companion.BluetoothDeviceFilter
 import android.companion.CompanionDeviceManager
 import android.content.*
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -15,11 +17,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.abelcht.n01f2smwc.R
 import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.display_data_fragment.*
 import java.time.LocalDateTime
 
@@ -59,8 +64,15 @@ class DisplayDataFragment : Fragment() {
         requireActivity().getSystemService(CompanionDeviceManager::class.java)
     }
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        // Location
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(this.requireActivity())
 
         // TODO: Add callback to bluetooth disconnect
 
@@ -161,14 +173,19 @@ class DisplayDataFragment : Fragment() {
     }
 
     /**
-     * Obtain the weather related info
+     * Obtain the location of the device
      */
     fun getDeviceLocation(callBackOnLocationObtained: (Location?) -> Unit) {
-        // TODO Must add a location requester
-        val lm = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        try {
-            callBackOnLocationObtained(lm!!.getLastKnownLocation(LocationManager.GPS_PROVIDER))
-        } catch (e: SecurityException) {
+        if (ActivityCompat.checkSelfPermission(
+                this.requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    callBackOnLocationObtained(location)
+                }
+        } else {
             callBackOnLocationObtained(null)
         }
     }
