@@ -76,10 +76,56 @@ class DisplayDataFragment : Fragment() {
 
         // TODO: Add callback to bluetooth disconnect
 
-        // TODO: Request bluetooth and location
+        // Request bluetooth
+        if (ActivityCompat.checkSelfPermission(
+                this.requireActivity(),
+                Manifest.permission.BLUETOOTH
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this.requireActivity(),
+                arrayOf(Manifest.permission.BLUETOOTH),
+                1001
+            )
+        }
 
-        // TODO: Request bluetooth and location permissions if not granted
+        if (ActivityCompat.checkSelfPermission(
+                this.requireActivity(),
+                Manifest.permission.BLUETOOTH_ADMIN
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this.requireActivity(),
+                arrayOf(Manifest.permission.BLUETOOTH_ADMIN),
+                1002
+            )
+        }
 
+        // Request location
+        if (ActivityCompat.checkSelfPermission(
+                this.requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this.requireActivity(),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1003
+            )
+        }
+
+        // Request internet
+        if (ActivityCompat.checkSelfPermission(
+                this.requireActivity(),
+                Manifest.permission.INTERNET
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this.requireActivity(),
+                arrayOf(Manifest.permission.INTERNET),
+                1004
+            )
+        }
 
         // To skip filtering based on name and supported feature flags (UUIDs),
         // don't include calls to setNamePattern() and addServiceUuid(),
@@ -183,9 +229,11 @@ class DisplayDataFragment : Fragment() {
         ) {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
+                    Log.i(TAG, "Obtained location")
                     callBackOnLocationObtained(location)
                 }
         } else {
+            Log.i(TAG, "No permission granted")
             callBackOnLocationObtained(null)
         }
     }
