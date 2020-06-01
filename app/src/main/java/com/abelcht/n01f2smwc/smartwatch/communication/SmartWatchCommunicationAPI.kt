@@ -6,8 +6,10 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.util.Log
+import com.abelcht.n01f2smwc.smartwatch.communication.packages.ChangeDateTimePackage
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.ConfigurePackage
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.SearchNotificationPackage
+import java.time.LocalDateTime
 import java.util.*
 
 class SmartWatchCommunicationAPI {
@@ -56,14 +58,15 @@ class SmartWatchCommunicationAPI {
                     smartWatchMainService.getCharacteristic(UUID.fromString("c3e6fea2-e966-1000-8000-be99c223df6a"))
                 if (smartWatchWriteCharacteristic != null && smartWatchNotificationCharacteristic != null) {
                     Log.i(logTag, "Characteristics catch successfully")
+
+                    // Send configure command
+                    configureSmartWatch()
+
                     onConnectionCompleteCallback?.invoke(true)
                 } else {
                     Log.i(logTag, "Error on characteristics catch")
                     onConnectionCompleteCallback?.invoke(false)
                 }
-
-                // Send configure command
-                configureSmartWatch()
             } else {
                 Log.i(logTag, "Error on service catch")
                 onConnectionCompleteCallback?.invoke(false)
@@ -120,6 +123,26 @@ class SmartWatchCommunicationAPI {
         return if (smartWatchWriteCharacteristic != null) {
             smartWatchWriteCharacteristic!!.value =
                 SearchNotificationPackage().getPackage().toByteArray()
+            bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
+        } else {
+            false
+        }
+    }
+
+    /**
+     * Change date and time
+     */
+    fun changeDateTime(localDateTime: LocalDateTime): Boolean {
+        return if (smartWatchWriteCharacteristic != null) {
+            smartWatchWriteCharacteristic!!.value =
+                ChangeDateTimePackage(
+                    localDateTime.hour,
+                    localDateTime.minute,
+                    localDateTime.second,
+                    localDateTime.dayOfMonth,
+                    localDateTime.monthValue,
+                    localDateTime.year
+                ).getPackage().toByteArray()
             bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
         } else {
             false

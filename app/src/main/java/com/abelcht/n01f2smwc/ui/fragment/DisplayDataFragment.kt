@@ -1,29 +1,45 @@
 package com.abelcht.n01f2smwc.ui.fragment
 
 import android.app.Activity
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.companion.AssociationRequest
 import android.companion.BluetoothDeviceFilter
 import android.companion.CompanionDeviceManager
-import android.content.Intent
-import android.content.IntentSender
+import android.content.*
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
 import com.abelcht.n01f2smwc.R
+import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
 import kotlinx.android.synthetic.main.display_data_fragment.*
-import java.util.*
+import java.time.LocalDateTime
 
 
 class DisplayDataFragment : Fragment() {
     private val viewModel: DisplayDataViewModel by activityViewModels()
+
+    private val timeAndDateChangeBroadcastReceiver: BroadcastReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent) {
+                val action = intent.action
+                if (action == Intent.ACTION_TIME_CHANGED || action == Intent.ACTION_TIMEZONE_CHANGED) {
+                    if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
+                        val currentDateTime = LocalDateTime.now()
+                        // Change date and time
+                        val notificationResult =
+                            viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+
+                        Log.i(TAG, "Changed time, result: $notificationResult")
+                    }
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +62,9 @@ class DisplayDataFragment : Fragment() {
         // TODO: Add callback to bluetooth disconnect
 
         // TODO: Request bluetooth and location
+
+        // TODO: Request bluetooth and location permissions if not granted
+
 
         // To skip filtering based on name and supported feature flags (UUIDs),
         // don't include calls to setNamePattern() and addServiceUuid(),
@@ -112,6 +131,18 @@ class DisplayDataFragment : Fragment() {
         findButton.setOnClickListener {
             val notificationResult = viewModel.smartWatchCommunicationAPI.sendSearchNotification()
             Log.i(TAG, "Find button pushed, result: $notificationResult")
+
+        }
+
+        alarmButton.setOnClickListener {
+            // TODO: Implement, this is only a test
+            // Change date and time
+            val currentDateTime = LocalDateTime.now()
+
+            val notificationResult =
+                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+
+            Log.i(TAG, "Changed time, result: $notificationResult")
         }
     }
 
@@ -126,6 +157,28 @@ class DisplayDataFragment : Fragment() {
         alarmButton.isEnabled = true
         actionButton.isEnabled = true
         findButton.isEnabled = true
+
+        // Change date and time
+        val currentDateTime = LocalDateTime.now()
+
+        val notificationResult =
+            viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+
+        Log.i(TAG, "Changed time, result: $notificationResult")
+
+        val changeDateTimeIntentFilter = IntentFilter()
+        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_TICK)
+        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
+        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_CHANGED)
+
+        requireActivity().registerReceiver(
+            timeAndDateChangeBroadcastReceiver,
+            changeDateTimeIntentFilter
+        )
+
+        // TODO: Add callback to calls and messages
+
+        // TODO: Change UV, Temperature ...
     }
 
     /**
@@ -152,9 +205,15 @@ class DisplayDataFragment : Fragment() {
         alarmButton.isEnabled = false
         actionButton.isEnabled = false
         findButton.isEnabled = false
+
+        // Delete callbacks
+        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
+            requireActivity().unregisterReceiver(timeAndDateChangeBroadcastReceiver)
+        }
+
+        // TODO: Delete callbacks
     }
 
-    @ExperimentalUnsignedTypes
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
