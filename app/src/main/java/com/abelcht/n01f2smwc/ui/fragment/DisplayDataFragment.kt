@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.abelcht.n01f2smwc.R
+import com.abelcht.n01f2smwc.openwheatherapi.getTemperaturePressureUV
 import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -199,15 +200,6 @@ class DisplayDataFragment : Fragment() {
             // TODO: Implement, this is only a test
             // Change UV ...
 
-            getDeviceLocation {
-                if (it != null) {
-                    Log.i(
-                        TAG,
-                        "Device location es altitude ${it.altitude} latitude ${it.latitude}  longitude ${it.longitude}"
-                    )
-                } else
-                    Log.i(TAG, "Device location es null")
-            }
 
 //            val currentDateTime = LocalDateTime.now()
 //
@@ -215,6 +207,44 @@ class DisplayDataFragment : Fragment() {
 //                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
 //
 //            Log.i(TAG, "Changed time, result: $notificationResult")
+        }
+
+        // Obtain short-time constant parameters
+        getDeviceLocation {
+            if (it != null) {
+                Log.i(
+                    TAG,
+                    "Device location is altitude ${it.altitude} latitude ${it.latitude}  longitude ${it.longitude}"
+                )
+                // TODO: Run on separate thread, with actual configuration Deadlock is produced
+                val temperaturePressureUV =
+                    getTemperaturePressureUV(it.latitude, it.longitude, this.requireActivity())
+
+                viewModel.altitude = it.altitude
+                viewModel.latitude = it.latitude
+                viewModel.longitude = it.longitude
+                if (temperaturePressureUV != null) {
+                    viewModel.pressure = temperaturePressureUV.second
+                    viewModel.temperature = temperaturePressureUV.first
+                    viewModel.uv = temperaturePressureUV.third
+                }
+                Log.i(
+                    TAG,
+                    "Antes require"
+                )
+                this.requireActivity().runOnUiThread {
+                    Log.i(
+                        TAG,
+                        "Dentro de require"
+                    )
+
+                    temperatureTextView.text = viewModel.temperature.toString()
+                    altitudeTextView.text = viewModel.altitude.toString()
+                    uvTextView.text = viewModel.uv.toString()
+                    pressureTextView.text = viewModel.pressure.toString()
+                }
+            } else
+                Log.i(TAG, "Device location es null")
         }
     }
 

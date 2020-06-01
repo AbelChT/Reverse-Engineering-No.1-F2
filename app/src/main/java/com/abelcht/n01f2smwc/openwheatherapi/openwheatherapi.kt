@@ -50,8 +50,11 @@ fun getTemperaturePressureUV(
 
     try {
         // Obtain responses
+        Log.i(TAG, "Before GET $temperatureAndBarometerRequestURL")
         val responseTemperatureAndBarometer = futureTemperatureAndBarometer.get() // this will block
+        Log.i(TAG, "Before GET $uVRequestURL")
         val responseUV = futureUV.get() // this will block
+        Log.i(TAG, "After GET")
 
 
         val temperature = when (val temperatureAny =
