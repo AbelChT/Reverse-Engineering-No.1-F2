@@ -4,10 +4,8 @@ import android.content.Context
 import android.util.Log
 import com.abelcht.n01f2smwc.config.openWeatherApiKey
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.RequestFuture
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
 import java.util.concurrent.ExecutionException
@@ -55,13 +53,26 @@ fun getTemperaturePressureUV(
         val responseTemperatureAndBarometer = futureTemperatureAndBarometer.get() // this will block
         val responseUV = futureUV.get() // this will block
 
-        val temperature =
-            (responseTemperatureAndBarometer.get("main") as JSONObject).get("temp") as Double
 
-        val pressure =
-            (responseTemperatureAndBarometer.get("main") as JSONObject).get("pressure") as Double
+        val temperature = when (val temperatureAny =
+            (responseTemperatureAndBarometer.get("main") as JSONObject).get("temp")) {
+            is Int -> temperatureAny.toDouble()
+            is Double -> temperatureAny
+            else -> 0.0
+        }
 
-        val uv = responseUV.get("value") as Double
+        val pressure = when (val pressureAny =
+            (responseTemperatureAndBarometer.get("main") as JSONObject).get("pressure")) {
+            is Int -> pressureAny.toDouble()
+            is Double -> pressureAny
+            else -> 0.0
+        }
+
+        val uv = when (val uvAny = responseUV.get("value")) {
+            is Int -> uvAny.toDouble()
+            is Double -> uvAny
+            else -> 0.0
+        }
 
         // Display responses
         Log.i(TAG, "Response is: $temperature $pressure $uv")
