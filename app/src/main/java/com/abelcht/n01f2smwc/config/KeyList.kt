@@ -1,3 +1,3 @@
 package com.abelcht.n01f2smwc.config
 
-var openWeatherAdiKey:String = ""
+var openWeatherApiKey: String = secretOpenWeatherApiKey

@@ -14,4 +14,4 @@
 .cxx
 /app/src/main/java/com/abelcht/n01f2smwc/smartwatch/config/DeviceInfo.kt
 /app/src/main/java/com/abelcht/n01f2smwc/smartwatch/config/DeviceInfoLocal.kt
-/app/src/main/java/com/abelcht/n01f2smwc/config/KeyList.kt
+/app/src/main/java/com/abelcht/n01f2smwc/config/SecretKeyList.kt
