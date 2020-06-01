@@ -17,5 +17,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         mainActivityToolbar.setupWithNavController(navController, appBarConfiguration)
+
+        // TODO: Setup CALL, Message and change data and time callback set a
     }
 }
