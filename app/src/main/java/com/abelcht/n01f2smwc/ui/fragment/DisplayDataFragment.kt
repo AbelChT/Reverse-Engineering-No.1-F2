@@ -7,12 +7,15 @@ import android.companion.AssociationRequest
 import android.companion.BluetoothDeviceFilter
 import android.companion.CompanionDeviceManager
 import android.content.*
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.abelcht.n01f2smwc.R
@@ -136,13 +139,37 @@ class DisplayDataFragment : Fragment() {
 
         alarmButton.setOnClickListener {
             // TODO: Implement, this is only a test
-            // Change date and time
-            val currentDateTime = LocalDateTime.now()
+            // Change UV ...
 
-            val notificationResult =
-                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+            getDeviceLocation {
+                if (it != null) {
+                    Log.i(
+                        TAG,
+                        "Device location es altitude ${it.altitude} latitude ${it.latitude}  longitude ${it.longitude}"
+                    )
+                } else
+                    Log.i(TAG, "Device location es null")
+            }
 
-            Log.i(TAG, "Changed time, result: $notificationResult")
+//            val currentDateTime = LocalDateTime.now()
+//
+//            val notificationResult =
+//                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+//
+//            Log.i(TAG, "Changed time, result: $notificationResult")
+        }
+    }
+
+    /**
+     * Obtain the weather related info
+     */
+    fun getDeviceLocation(callBackOnLocationObtained: (Location?) -> Unit) {
+        // TODO Must add a location requester
+        val lm = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        try {
+            callBackOnLocationObtained(lm!!.getLastKnownLocation(LocationManager.GPS_PROVIDER))
+        } catch (e: SecurityException) {
+            callBackOnLocationObtained(null)
         }
     }
 
@@ -171,10 +198,11 @@ class DisplayDataFragment : Fragment() {
         changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
         changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_CHANGED)
 
-        requireActivity().registerReceiver(
-            timeAndDateChangeBroadcastReceiver,
-            changeDateTimeIntentFilter
-        )
+        // TODO: Change
+//        requireActivity().registerReceiver(
+//            timeAndDateChangeBroadcastReceiver,
+//            changeDateTimeIntentFilter
+//        )
 
         // TODO: Add callback to calls and messages
 
