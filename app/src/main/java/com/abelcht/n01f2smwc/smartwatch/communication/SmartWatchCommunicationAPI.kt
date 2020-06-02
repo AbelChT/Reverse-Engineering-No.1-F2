@@ -158,9 +158,10 @@ class SmartWatchCommunicationAPI {
         val uvField = if (uv.roundToInt() in 0..5) uv.roundToInt() else 5
         val barometerField =
             if (pressure.roundToInt() in 0..299999) pressure.roundToInt() else 299999
-        val altitudeField = if (altitude.roundToInt() in 0..9999) altitude.roundToInt() else 9999
+        val altitudeField =
+            if ((altitude * 10).roundToInt() in 0..9999) (altitude * 10).roundToInt() else 9999
         val temperatureField =
-            if (temperature.roundToInt() in 0..99) altitude.roundToInt() else if (temperature.roundToInt() < 0) 0 else 9999
+            if (temperature.roundToInt() in 0..99) temperature.roundToInt() else if (temperature.roundToInt() < 0) 0 else 99
 
         return if (smartWatchWriteCharacteristic != null) {
             smartWatchWriteCharacteristic!!.value = ChangeUVTemperatureAltitudeBarometerPackage(

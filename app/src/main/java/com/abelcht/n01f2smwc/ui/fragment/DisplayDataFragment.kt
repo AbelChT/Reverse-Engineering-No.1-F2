@@ -296,6 +296,21 @@ class DisplayDataFragment : Fragment() {
 
         Log.i(TAG, "Changed time, result: $notificationResult")
 
+        // Change uv pressure temperature and altitude
+        val changeUVPressureTemperatureAltitudeResult =
+            viewModel.smartWatchCommunicationAPI.changeAltitudeTemperaturePressureUV(
+                viewModel.altitude,
+                viewModel.temperature,
+                viewModel.pressure,
+                viewModel.uv
+            )
+
+        Log.i(
+            TAG,
+            "Changed changeUVPressureTemperatureAltitudeResult, result: $changeUVPressureTemperatureAltitudeResult"
+        )
+
+
 //        val changeDateTimeIntentFilter = IntentFilter()
 //        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_TICK)
 //        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
