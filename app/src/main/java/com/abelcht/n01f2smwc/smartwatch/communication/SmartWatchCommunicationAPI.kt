@@ -6,12 +6,11 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.util.Log
-import com.abelcht.n01f2smwc.smartwatch.communication.packages.ChangeDateTimePackage
-import com.abelcht.n01f2smwc.smartwatch.communication.packages.ConfigurePackage
-import com.abelcht.n01f2smwc.smartwatch.communication.packages.SearchNotificationPackage
+import com.abelcht.n01f2smwc.smartwatch.communication.packages.*
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
+import kotlin.math.roundToInt
 
 class SmartWatchCommunicationAPI {
     // Tag for the logs
@@ -156,32 +155,71 @@ class SmartWatchCommunicationAPI {
     fun changeAltitudeTemperaturePressureUV(
         altitude: Double, temperature: Double, pressure: Double, uv: Double
     ): Boolean {
-        // TODO:
-        return true
+        val uvField = if (uv.roundToInt() in 0..5) uv.roundToInt() else 5
+        val barometerField =
+            if (pressure.roundToInt() in 0..299999) pressure.roundToInt() else 299999
+        val altitudeField = if (altitude.roundToInt() in 0..9999) altitude.roundToInt() else 9999
+        val temperatureField =
+            if (temperature.roundToInt() in 0..99) altitude.roundToInt() else if (temperature.roundToInt() < 0) 0 else 9999
+
+        return if (smartWatchWriteCharacteristic != null) {
+            smartWatchWriteCharacteristic!!.value = ChangeUVTemperatureAltitudeBarometerPackage(
+                uvField,
+                temperatureField,
+                altitudeField,
+                barometerField
+            ).getPackage().toByteArray()
+            bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
+        } else {
+            false
+        }
     }
 
     /**
      * Send call notification
      */
     fun sendCallNotification(): Boolean {
-        // TODO:
-        return true
+        return if (smartWatchWriteCharacteristic != null) {
+            smartWatchWriteCharacteristic!!.value =
+                CallNotificationPackage().getPackage().toByteArray()
+            bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
+        } else {
+            false
+        }
     }
 
     /**
      * Send message notification
      */
     fun sendMessageNotification(): Boolean {
-        // TODO:
-        return true
+        return if (smartWatchWriteCharacteristic != null) {
+            smartWatchWriteCharacteristic!!.value =
+                MessageNotificationPackage().getPackage().toByteArray()
+            bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
+        } else {
+            false
+        }
     }
 
     /**
      * Send message notification
      */
-    fun changeAlarm(localTime: LocalTime): Boolean {
-        // TODO:
-        return true
+    fun changeAlarm(localTime: LocalTime?): Boolean {
+        return if (smartWatchWriteCharacteristic != null) {
+            smartWatchWriteCharacteristic!!.value = if (localTime != null)
+                ManageAlarmPackage(
+                    true,
+                    localTime.hour,
+                    localTime.minute,
+                    localTime.second
+                ).getPackage().toByteArray()
+            else
+                ManageAlarmPackage(false).getPackage().toByteArray()
+
+            bluetoothGatt!!.writeCharacteristic(smartWatchWriteCharacteristic)
+        } else {
+            false
+        }
     }
 
 
