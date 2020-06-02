@@ -3,90 +3,84 @@ package com.abelcht.n01f2smwc.openwheatherapi
 import android.content.Context
 import android.util.Log
 import com.abelcht.n01f2smwc.config.openWeatherApiKey
+import com.abelcht.n01f2smwc.network.HTTPJSONRequester
 import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.RequestFuture
-import com.android.volley.toolbox.Volley
 import org.json.JSONObject
-import java.util.concurrent.ExecutionException
 
+private val logTag = "getTemperatureOpenWeatherAPITest"
 
-fun getTemperaturePressureUV(
+fun getTemperaturePressure(
     latitude: Double,
     longitude: Double,
-    context: Context
-): Triple<Double, Double, Double>? {
-    val TAG = "getTemperatureOpenWeatherAPITest"
-
+    context: Context,
+    callback: (Pair<Double, Double>?) -> Unit
+) {
     // API call config
-    val parameters = "?lat=${latitude}&lon=${longitude}&appid=${openWeatherApiKey}"
     val temperatureAndBarometerRequestURL =
-        "https://api.openweathermap.org/data/2.5/weather$parameters"
-    val uVRequestURL = "https://api.openweathermap.org/data/2.5/uvi$parameters"
+        "https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${openWeatherApiKey}"
 
-    // Request queue
-    val requestQueue = Volley.newRequestQueue(context)
+    // Request object
+    val jsonObjectRequest =
+        JsonObjectRequest(Request.Method.GET, temperatureAndBarometerRequestURL, null,
+            Response.Listener { responseTemperatureAndBarometer ->
+                val temperature = when (val temperatureAny =
+                    (responseTemperatureAndBarometer.get("main") as JSONObject).get("temp")) {
+                    is Int -> temperatureAny.toDouble()
+                    is Double -> temperatureAny
+                    else -> 0.0
+                }
 
-    // Temperature and barometer
-    val futureTemperatureAndBarometer = RequestFuture.newFuture<JSONObject>()
-    val requestTemperatureAndBarometer = JsonObjectRequest(
-        Request.Method.GET,
-        temperatureAndBarometerRequestURL,
-        JSONObject(),
-        futureTemperatureAndBarometer,
-        futureTemperatureAndBarometer
-    )
-    requestQueue.add(requestTemperatureAndBarometer)
+                val pressure = when (val pressureAny =
+                    (responseTemperatureAndBarometer.get("main") as JSONObject).get("pressure")) {
+                    is Int -> pressureAny.toDouble()
+                    is Double -> pressureAny
+                    else -> 0.0
+                }
+                Log.i(logTag, "TemperaturePressure response is: $temperature $pressure")
 
-    // UV
-    val futureUV = RequestFuture.newFuture<JSONObject>()
-    val requestUV = JsonObjectRequest(
-        Request.Method.GET, uVRequestURL,
-        JSONObject(),
-        futureUV,
-        futureUV
-    )
-    requestQueue.add(requestUV)
+                callback(Pair(temperature, pressure))
+            },
+            Response.ErrorListener {
+                Log.i(logTag, "Null have arrived TemperaturePressure")
+                callback(null)
+            }
+        )
 
-    try {
-        // Obtain responses
-        Log.i(TAG, "Before GET $temperatureAndBarometerRequestURL")
-        val responseTemperatureAndBarometer = futureTemperatureAndBarometer.get() // this will block
-        Log.i(TAG, "Before GET $uVRequestURL")
-        val responseUV = futureUV.get() // this will block
-        Log.i(TAG, "After GET")
+    // Add request
+    HTTPJSONRequester.getInstance(context).addToRequestQueue(jsonObjectRequest)
+}
 
+fun getUV(
+    latitude: Double,
+    longitude: Double,
+    context: Context,
+    callback: (Double?) -> Unit
+) {
+    // API call config
+    val uVRequestURL =
+        "https://api.openweathermap.org/data/2.5/uvi?lat=${latitude}&lon=${longitude}&appid=${openWeatherApiKey}"
 
-        val temperature = when (val temperatureAny =
-            (responseTemperatureAndBarometer.get("main") as JSONObject).get("temp")) {
-            is Int -> temperatureAny.toDouble()
-            is Double -> temperatureAny
-            else -> 0.0
-        }
+    // Request object
+    val jsonObjectRequest =
+        JsonObjectRequest(Request.Method.GET, uVRequestURL, null,
+            Response.Listener { responseUV ->
+                val uv = when (val uvAny = responseUV.get("value")) {
+                    is Int -> uvAny.toDouble()
+                    is Double -> uvAny
+                    else -> 0.0
+                }
+                Log.i(logTag, "UV response is: $uv")
 
-        val pressure = when (val pressureAny =
-            (responseTemperatureAndBarometer.get("main") as JSONObject).get("pressure")) {
-            is Int -> pressureAny.toDouble()
-            is Double -> pressureAny
-            else -> 0.0
-        }
+                callback(uv)
+            },
+            Response.ErrorListener {
+                Log.i(logTag, "Null have arrived UV")
+                callback(null)
+            }
+        )
 
-        val uv = when (val uvAny = responseUV.get("value")) {
-            is Int -> uvAny.toDouble()
-            is Double -> uvAny
-            else -> 0.0
-        }
-
-        // Display responses
-        Log.i(TAG, "Response is: $temperature $pressure $uv")
-        return Triple(temperature, pressure, uv)
-    } catch (e: InterruptedException) {
-        // exception handling
-        Log.i(TAG, "InterruptedException have arrived")
-        return null
-    } catch (e: ExecutionException) {
-        // exception handling
-        Log.i(TAG, "ExecutionException have arrived")
-        return null
-    }
+    // Add request
+    HTTPJSONRequester.getInstance(context).addToRequestQueue(jsonObjectRequest)
 }
