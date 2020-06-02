@@ -231,7 +231,7 @@ class DisplayDataFragment : Fragment() {
                 ) { temperaturePressure ->
                     if (temperaturePressure != null) {
                         viewModel.pressure = temperaturePressure.second
-                        viewModel.temperature = temperaturePressure.first
+                        viewModel.temperature = temperaturePressure.first - 273.16 // Convert to ºC
 
                         this.requireActivity().runOnUiThread {
                             temperatureTextView.text = "%.2f".format(viewModel.temperature)
@@ -296,10 +296,10 @@ class DisplayDataFragment : Fragment() {
 
         Log.i(TAG, "Changed time, result: $notificationResult")
 
-        val changeDateTimeIntentFilter = IntentFilter()
-        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_TICK)
-        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
-        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_CHANGED)
+//        val changeDateTimeIntentFilter = IntentFilter()
+//        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_TICK)
+//        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
+//        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_CHANGED)
 
         // TODO: Change
 //        requireActivity().registerReceiver(

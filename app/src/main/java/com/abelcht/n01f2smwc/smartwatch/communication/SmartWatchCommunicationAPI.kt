@@ -10,6 +10,7 @@ import com.abelcht.n01f2smwc.smartwatch.communication.packages.ChangeDateTimePac
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.ConfigurePackage
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.SearchNotificationPackage
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.*
 
 class SmartWatchCommunicationAPI {
@@ -149,4 +150,46 @@ class SmartWatchCommunicationAPI {
         }
     }
 
+    /**
+     * Change Altitude Temperature Pressure and UV
+     */
+    fun changeAltitudeTemperaturePressureUV(
+        altitude: Double, temperature: Double, pressure: Double, uv: Double
+    ): Boolean {
+        // TODO:
+        return true
+    }
+
+    /**
+     * Send call notification
+     */
+    fun sendCallNotification(): Boolean {
+        // TODO:
+        return true
+    }
+
+    /**
+     * Send message notification
+     */
+    fun sendMessageNotification(): Boolean {
+        // TODO:
+        return true
+    }
+
+    /**
+     * Send message notification
+     */
+    fun changeAlarm(localTime: LocalTime): Boolean {
+        // TODO:
+        return true
+    }
+
+
+    /**
+     * Obtain pedometer info
+     */
+    fun addPedometerListener(pedometerCallback: (Int) -> Unit): Boolean {
+        // TODO:
+        return true
+    }
 }
