@@ -1,9 +1,6 @@
 package com.abelcht.n01f2smwc.smartwatch.communication
 
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.*
 import android.content.Context
 import android.util.Log
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.*
@@ -11,6 +8,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
 import kotlin.math.roundToInt
+
 
 class SmartWatchCommunicationAPI {
     // Tag for the logs
@@ -59,6 +57,11 @@ class SmartWatchCommunicationAPI {
                 if (smartWatchWriteCharacteristic != null && smartWatchNotificationCharacteristic != null) {
                     Log.i(logTag, "Characteristics catch successfully")
 
+                    // Activate notifications
+                    bluetoothGatt!!.setCharacteristicNotification(
+                        smartWatchNotificationCharacteristic, true
+                    )
+
                     // Send configure command
                     configureSmartWatch()
 
@@ -71,6 +74,18 @@ class SmartWatchCommunicationAPI {
                 Log.i(logTag, "Error on service catch")
                 onConnectionCompleteCallback?.invoke(false)
             }
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic)
+            // TODO: Complete it
+            Log.i(
+                logTag,
+                "On characteristic change ${characteristic!!.uuid} ${characteristic.value}"
+            )
         }
     }
 
@@ -229,6 +244,16 @@ class SmartWatchCommunicationAPI {
      */
     fun addPedometerListener(pedometerCallback: (Int) -> Unit): Boolean {
         // TODO:
+//        if(smartWatchNotificationCharacteristic !=null){
+//            bluetoothGatt!!.setCharacteristicNotification(smartWatchNotificationCharacteristic, false)
+//        }
+
+//        val uuid: UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG)
+//        val descriptor = characteristic.getDescriptor(uuid).apply {
+//            value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+//        }
+//        bluetoothGatt.writeDescriptor(descriptor)
+
         return true
     }
 }
