@@ -10,7 +10,6 @@ import android.companion.CompanionDeviceManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,7 +17,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.abelcht.n01f2smwc.R
@@ -34,23 +32,23 @@ import java.time.LocalDateTime
 
 class DisplayDataFragment : Fragment() {
     private val viewModel: DisplayDataViewModel by activityViewModels()
-
-    private val timeAndDateChangeBroadcastReceiver: BroadcastReceiver =
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent) {
-                val action = intent.action
-                if (action == Intent.ACTION_TIME_CHANGED || action == Intent.ACTION_TIMEZONE_CHANGED) {
-                    if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
-                        val currentDateTime = LocalDateTime.now()
-                        // Change date and time
-                        val notificationResult =
-                            viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
-
-                        Log.i(TAG, "Changed time, result: $notificationResult")
-                    }
-                }
-            }
-        }
+//
+//    private val timeAndDateChangeBroadcastReceiver: BroadcastReceiver =
+//        object : BroadcastReceiver() {
+//            override fun onReceive(context: Context?, intent: Intent) {
+//                val action = intent.action
+//                if (action == Intent.ACTION_TIME_CHANGED || action == Intent.ACTION_TIMEZONE_CHANGED) {
+//                    if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
+//                        val currentDateTime = LocalDateTime.now()
+//                        // Change date and time
+//                        val notificationResult =
+//                            viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+//
+//                        Log.i(TAG, "Changed time, result: $notificationResult")
+//                    }
+//                }
+//            }
+//        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,7 +59,7 @@ class DisplayDataFragment : Fragment() {
 
     val SELECT_DEVICE_REQUEST_CODE = 43
     val REQUEST_ENABLE_BT = 41
-    private val TAG = "MainActivity"
+    private val TAG = "DisplayDataFragment"
 
     private val deviceManager: CompanionDeviceManager by lazy(LazyThreadSafetyMode.NONE) {
         requireActivity().getSystemService(CompanionDeviceManager::class.java)
@@ -69,9 +67,20 @@ class DisplayDataFragment : Fragment() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    override fun onStart() {
+        super.onStart()
+        Log.i(TAG, "onStart")
+    }
+
+    override fun onDestroy() {
+        Log.i(TAG, "onDestroy")
+        super.onDestroy()
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        Log.i(TAG, "onActivityCreated")
 
         // Location
         fusedLocationClient =
@@ -254,6 +263,29 @@ class DisplayDataFragment : Fragment() {
             } else
                 Log.i(TAG, "Device location es null")
         }
+
+        viewModel.onDateTimeChangeCallback = {
+            Log.i(TAG, "onDateTimeChangeCallback ha sio llamado")
+
+            //            object : BroadcastReceiver() {
+//                override fun onReceive(context: Context?, intent: Intent) {
+//                    val action = intent.action
+//                    if (action == Intent.ACTION_TIME_CHANGED || action == Intent.ACTION_TIMEZONE_CHANGED) {
+////                        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
+////                            val currentDateTime = LocalDateTime.now()
+////                            // Change date and time
+////                            val notificationResult =
+////                                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
+////
+////                            Log.i(TAG, "Changed time, result: $notificationResult")
+////                        }
+//                        if (viewModel.onDateTimeChangeCallback != null) {
+//                            viewModel.onDateTimeChangeCallback!!.invoke()
+//                        }
+//                    }
+//                }
+//            }
+        }
     }
 
     /**
@@ -353,9 +385,9 @@ class DisplayDataFragment : Fragment() {
         findButton.isEnabled = false
 
         // Delete callbacks
-        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
-            requireActivity().unregisterReceiver(timeAndDateChangeBroadcastReceiver)
-        }
+//        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
+//            requireActivity().unregisterReceiver(timeAndDateChangeBroadcastReceiver)
+//        }
 
         // TODO: Delete callbacks
     }

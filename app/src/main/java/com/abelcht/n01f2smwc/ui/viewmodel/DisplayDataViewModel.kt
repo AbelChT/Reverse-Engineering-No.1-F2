@@ -16,4 +16,7 @@ class DisplayDataViewModel : ViewModel() {
     var uv: Double = 0.0
     var temperature: Double = 0.0
     var pressure: Double = 0.0
+
+    // System event callbacks
+    var onDateTimeChangeCallback: (() -> Unit)? = null
 }
