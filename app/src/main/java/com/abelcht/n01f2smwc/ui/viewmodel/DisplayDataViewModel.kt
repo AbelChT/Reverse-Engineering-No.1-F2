@@ -19,4 +19,8 @@ class DisplayDataViewModel : ViewModel() {
 
     // System event callbacks
     var onDateTimeChangeCallback: (() -> Unit)? = null
+
+    var onCallArriveCallback: (() -> Unit)? = null
+
+    var onMessageArriveCallback: (() -> Unit)? = null
 }

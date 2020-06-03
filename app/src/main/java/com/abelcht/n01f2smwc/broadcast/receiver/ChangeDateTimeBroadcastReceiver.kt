@@ -7,7 +7,6 @@ import android.content.IntentFilter
 class ChangeDateTimeBroadcastReceiver(private val context: Context) : CustomBroadcastReceiver() {
     override fun configureAndRegisterReceiver() {
         val changeDateTimeIntentFilter = IntentFilter()
-        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_TICK)
         changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
         changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_CHANGED)
         context.registerReceiver(

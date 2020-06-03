@@ -88,57 +88,6 @@ class DisplayDataFragment : Fragment() {
 
         // TODO: Add callback to bluetooth disconnect
 
-        // Request bluetooth
-        if (ActivityCompat.checkSelfPermission(
-                this.requireActivity(),
-                Manifest.permission.BLUETOOTH
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this.requireActivity(),
-                arrayOf(Manifest.permission.BLUETOOTH),
-                1001
-            )
-        }
-
-        if (ActivityCompat.checkSelfPermission(
-                this.requireActivity(),
-                Manifest.permission.BLUETOOTH_ADMIN
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this.requireActivity(),
-                arrayOf(Manifest.permission.BLUETOOTH_ADMIN),
-                1002
-            )
-        }
-
-        // Request location
-        if (ActivityCompat.checkSelfPermission(
-                this.requireActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this.requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1003
-            )
-        }
-
-        // Request internet
-        if (ActivityCompat.checkSelfPermission(
-                this.requireActivity(),
-                Manifest.permission.INTERNET
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this.requireActivity(),
-                arrayOf(Manifest.permission.INTERNET),
-                1004
-            )
-        }
-
         // To skip filtering based on name and supported feature flags (UUIDs),
         // don't include calls to setNamePattern() and addServiceUuid(),
         // respectively. This example uses Bluetooth.
