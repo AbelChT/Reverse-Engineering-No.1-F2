@@ -32,23 +32,6 @@ import java.time.LocalDateTime
 
 class DisplayDataFragment : Fragment() {
     private val viewModel: DisplayDataViewModel by activityViewModels()
-//
-//    private val timeAndDateChangeBroadcastReceiver: BroadcastReceiver =
-//        object : BroadcastReceiver() {
-//            override fun onReceive(context: Context?, intent: Intent) {
-//                val action = intent.action
-//                if (action == Intent.ACTION_TIME_CHANGED || action == Intent.ACTION_TIMEZONE_CHANGED) {
-//                    if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
-//                        val currentDateTime = LocalDateTime.now()
-//                        // Change date and time
-//                        val notificationResult =
-//                            viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
-//
-//                        Log.i(TAG, "Changed time, result: $notificationResult")
-//                    }
-//                }
-//            }
-//        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -158,15 +141,6 @@ class DisplayDataFragment : Fragment() {
 
         alarmButton.setOnClickListener {
             // TODO: Implement, this is only a test
-            // Change UV ...
-
-
-//            val currentDateTime = LocalDateTime.now()
-//
-//            val notificationResult =
-//                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
-//
-//            Log.i(TAG, "Changed time, result: $notificationResult")
         }
 
         // Obtain short-time constant parameters
@@ -213,27 +187,30 @@ class DisplayDataFragment : Fragment() {
                 Log.i(TAG, "Device location es null")
         }
 
+        // On date time change
         viewModel.onDateTimeChangeCallback = {
-            Log.i(TAG, "onDateTimeChangeCallback ha sio llamado")
+            val currentDateTime = LocalDateTime.now()
+            // Change date and time
+            val notificationResult =
+                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
 
-            //            object : BroadcastReceiver() {
-//                override fun onReceive(context: Context?, intent: Intent) {
-//                    val action = intent.action
-//                    if (action == Intent.ACTION_TIME_CHANGED || action == Intent.ACTION_TIMEZONE_CHANGED) {
-////                        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
-////                            val currentDateTime = LocalDateTime.now()
-////                            // Change date and time
-////                            val notificationResult =
-////                                viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
-////
-////                            Log.i(TAG, "Changed time, result: $notificationResult")
-////                        }
-//                        if (viewModel.onDateTimeChangeCallback != null) {
-//                            viewModel.onDateTimeChangeCallback!!.invoke()
-//                        }
-//                    }
-//                }
-//            }
+            Log.i(TAG, "Changed time, result: $notificationResult")
+        }
+
+        // On new call
+        viewModel.onCallArriveCallback = {
+            // Change date and time
+            val notificationResult = viewModel.smartWatchCommunicationAPI.sendCallNotification()
+
+            Log.i(TAG, "New call, result: $notificationResult")
+        }
+
+        // On new message
+        viewModel.onMessageArriveCallback = {
+            // Change date and time
+            val notificationResult = viewModel.smartWatchCommunicationAPI.sendMessageNotification()
+
+            Log.i(TAG, "New message, result: $notificationResult")
         }
     }
 
