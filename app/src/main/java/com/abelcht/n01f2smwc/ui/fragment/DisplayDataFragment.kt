@@ -2,12 +2,15 @@ package com.abelcht.n01f2smwc.ui.fragment
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.companion.AssociationRequest
 import android.companion.BluetoothDeviceFilter
 import android.companion.CompanionDeviceManager
-import android.content.*
+import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -22,12 +25,13 @@ import androidx.fragment.app.activityViewModels
 import com.abelcht.n01f2smwc.R
 import com.abelcht.n01f2smwc.openwheatherapi.getTemperaturePressure
 import com.abelcht.n01f2smwc.openwheatherapi.getUV
-
 import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.display_data_fragment.*
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.util.*
 
 
 class DisplayDataFragment : Fragment() {
@@ -141,6 +145,8 @@ class DisplayDataFragment : Fragment() {
 
         alarmButton.setOnClickListener {
             // TODO: Implement, this is only a test
+
+
         }
 
         // Obtain short-time constant parameters
@@ -246,6 +252,7 @@ class DisplayDataFragment : Fragment() {
         actionButton.isEnabled = true
         findButton.isEnabled = true
 
+        // TODO: Add delay
         // Change date and time
         val currentDateTime = LocalDateTime.now()
 
@@ -268,21 +275,26 @@ class DisplayDataFragment : Fragment() {
             "Changed changeUVPressureTemperatureAltitudeResult, result: $changeUVPressureTemperatureAltitudeResult"
         )
 
+        // TODO: Add delay
+        // Change alarm
+        val alarmManager =
+            requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val nextAlarm = alarmManager.nextAlarmClock
+        if (nextAlarm != null) {
+            val nextAlarmDate = Date(nextAlarm.triggerTime)
+            Log.i(TAG, "Next alarm in: ${nextAlarmDate.hours}:${nextAlarmDate.minutes}")
 
-//        val changeDateTimeIntentFilter = IntentFilter()
-//        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_TICK)
-//        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED)
-//        changeDateTimeIntentFilter.addAction(Intent.ACTION_TIME_CHANGED)
+            val changeAlarmResult = viewModel.smartWatchCommunicationAPI.changeAlarm(
+                LocalTime.of(nextAlarmDate.hours, nextAlarmDate.minutes)
+            )
 
-        // TODO: Change
-//        requireActivity().registerReceiver(
-//            timeAndDateChangeBroadcastReceiver,
-//            changeDateTimeIntentFilter
-//        )
+            Log.i(TAG, "Changed changeAlarmResult, result: $changeAlarmResult")
+        } else {
+            Log.i(TAG, "No next alarm")
+            val changeAlarmResult = viewModel.smartWatchCommunicationAPI.changeAlarm(null)
 
-        // TODO: Add callback to calls and messages
-
-        // TODO: Change UV, Temperature ...
+            Log.i(TAG, "Changed changeAlarmResult, result: $changeAlarmResult")
+        }
     }
 
     /**
