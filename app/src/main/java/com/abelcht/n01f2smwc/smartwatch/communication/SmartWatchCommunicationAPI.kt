@@ -75,7 +75,6 @@ class SmartWatchCommunicationAPI {
                     bytesToRead = 0
                 }
             } else if (messageValue[0] == 0xa9.toByte()) {
-                Log.i(logTag, "Is in header of reconstructed package")
                 // New package with correct header
                 val packageExpectedSize =
                     4 + messageValue[3].toInt() + 1  // header size + content size + crc
@@ -104,35 +103,35 @@ class SmartWatchCommunicationAPI {
                     reassembledPackage[1] == 0x21.toByte() -> {
                         // Pedometer package
                         val distance =
-                            reassembledPackage[reassembledPackage.size - 2].toUByte().toInt() +
+                            reassembledPackage[reassembledPackage.size - 4].toUByte().toInt() +
                                     reassembledPackage[reassembledPackage.size - 3].toUByte()
                                         .toInt() *
                                     (2.0.pow(8).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 4].toUByte()
+                                    reassembledPackage[reassembledPackage.size - 2].toUByte()
                                         .toInt() *
                                     (2.0.pow(16).toInt())
 
                         val kcal =
-                            reassembledPackage[reassembledPackage.size - 5].toByte().toInt() +
-                                    reassembledPackage[reassembledPackage.size - 6].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(8).toInt()) +
+                            reassembledPackage[reassembledPackage.size - 8].toUByte().toInt() +
                                     reassembledPackage[reassembledPackage.size - 7].toUByte()
                                         .toInt() *
+                                    (2.0.pow(8).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 6].toUByte()
+                                        .toInt() *
                                     (2.0.pow(16).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 8].toUByte()
+                                    reassembledPackage[reassembledPackage.size - 5].toUByte()
                                         .toInt() *
                                     (2.0.pow(24).toInt())
 
                         val steps =
-                            reassembledPackage[reassembledPackage.size - 9].toUByte().toInt() +
-                                    reassembledPackage[reassembledPackage.size - 10].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(8).toInt()) +
+                            reassembledPackage[reassembledPackage.size - 12].toUByte().toInt() +
                                     reassembledPackage[reassembledPackage.size - 11].toUByte()
                                         .toInt() *
+                                    (2.0.pow(8).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 10].toUByte()
+                                        .toInt() *
                                     (2.0.pow(16).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 12].toUByte()
+                                    reassembledPackage[reassembledPackage.size - 9].toUByte()
                                         .toInt() *
                                     (2.0.pow(24).toInt())
                         Log.i(
@@ -203,10 +202,6 @@ class SmartWatchCommunicationAPI {
             if (smartWatchNotificationCharacteristic!!.uuid.toString() == characteristic!!.uuid.toString() && characteristic.value != null
             )
                 processNotificationMessage(characteristic.value.toTypedArray())
-            Log.i(
-                logTag,
-                "On characteristic change ${characteristic.uuid} ${characteristic.value.toTypedArray()}"
-            )
         }
     }
 
