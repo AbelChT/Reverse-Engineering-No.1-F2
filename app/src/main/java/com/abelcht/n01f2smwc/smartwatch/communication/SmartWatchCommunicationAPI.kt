@@ -4,9 +4,11 @@ import android.bluetooth.*
 import android.content.Context
 import android.util.Log
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.*
+import java.lang.Math.pow
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 
@@ -28,6 +30,7 @@ class SmartWatchCommunicationAPI {
     private var smartWatchNotificationCharacteristic: BluetoothGattCharacteristic? = null
 
     // Callback for bluetooth connection
+    @ExperimentalUnsignedTypes
     private val bluetoothGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
@@ -43,6 +46,122 @@ class SmartWatchCommunicationAPI {
                 }
             }
         }
+
+        // True if we are reassembling a package
+        var isReassemblingPackage: Boolean = false
+
+        // Package that are been reassembled
+        val reassembledPackage = arrayListOf<Byte>()
+
+        // Bytes to finish the package
+        var bytesToRead = 0
+
+        fun bytesToString(bytes: List<Byte>): String {
+            var finalString = "{"
+            for (j in bytes) {
+                finalString += "${j.toUByte().toInt()}, "
+            }
+            return "$finalString}"
+        }
+
+        private fun processNotificationMessage(messageValue: Array<Byte>) {
+            // Reassemble package
+            if (isReassemblingPackage) {
+                reassembledPackage.addAll(messageValue)
+                if (bytesToRead != messageValue.size) {
+                    bytesToRead -= messageValue.size
+                } else {
+                    isReassemblingPackage = false
+                    bytesToRead = 0
+                }
+            } else if (messageValue[0] == 0xa9.toByte()) {
+                Log.i(logTag, "Is in header of reconstructed package")
+                // New package with correct header
+                val packageExpectedSize =
+                    4 + messageValue[3].toInt() + 1  // header size + content size + crc
+                reassembledPackage.clear()
+                reassembledPackage.addAll(messageValue)
+                if (packageExpectedSize != messageValue.size) {
+                    bytesToRead = packageExpectedSize - messageValue.size
+                    isReassemblingPackage = true
+                }
+            } else {
+                //New package with wrong header
+                bytesToRead = 0
+                reassembledPackage.clear()
+                Log.i(logTag, "Error in received message: Wrong header")
+            }
+
+            if (bytesToRead < 0) {
+                // Error in message
+                bytesToRead = 0
+                isReassemblingPackage = false
+                reassembledPackage.clear()
+                Log.i(logTag, "Error in received message: Exceeded length")
+            } else if (!isReassemblingPackage) {
+                // Analyze package
+                when {
+                    reassembledPackage[1] == 0x21.toByte() -> {
+                        // Pedometer package
+                        val distance =
+                            reassembledPackage[reassembledPackage.size - 2].toUByte().toInt() +
+                                    reassembledPackage[reassembledPackage.size - 3].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(8).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 4].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(16).toInt())
+
+                        val kcal =
+                            reassembledPackage[reassembledPackage.size - 5].toByte().toInt() +
+                                    reassembledPackage[reassembledPackage.size - 6].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(8).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 7].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(16).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 8].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(24).toInt())
+
+                        val steps =
+                            reassembledPackage[reassembledPackage.size - 9].toUByte().toInt() +
+                                    reassembledPackage[reassembledPackage.size - 10].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(8).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 11].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(16).toInt()) +
+                                    reassembledPackage[reassembledPackage.size - 12].toUByte()
+                                        .toInt() *
+                                    (2.0.pow(24).toInt())
+                        Log.i(
+                            logTag,
+                            "Pedometer package received and assembled ${bytesToString(
+                                reassembledPackage
+                            )} distace : $distance kcal: $kcal steps: $steps"
+                        )
+                    }
+                    reassembledPackage[1] == 0x0f.toByte() -> {
+                        Log.i(
+                            logTag,
+                            "Received photo action package, but won't be used ${bytesToString(
+                                reassembledPackage
+                            )}"
+                        )
+                    }
+                    else -> {
+                        Log.i(
+                            logTag,
+                            "Unrecognised package received (well formatted) ${bytesToString(
+                                reassembledPackage
+                            )}"
+                        )
+                    }
+                }
+            }
+        }
+
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             super.onServicesDiscovered(gatt, status)
@@ -81,10 +200,12 @@ class SmartWatchCommunicationAPI {
             characteristic: BluetoothGattCharacteristic?
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            // TODO: Complete it
+            if (smartWatchNotificationCharacteristic!!.uuid.toString() == characteristic!!.uuid.toString() && characteristic.value != null
+            )
+                processNotificationMessage(characteristic.value.toTypedArray())
             Log.i(
                 logTag,
-                "On characteristic change ${characteristic!!.uuid} ${characteristic.value}"
+                "On characteristic change ${characteristic.uuid} ${characteristic.value.toTypedArray()}"
             )
         }
     }
