@@ -143,12 +143,6 @@ class DisplayDataFragment : Fragment() {
 
         }
 
-        alarmButton.setOnClickListener {
-            // TODO: Implement, this is only a test
-
-
-        }
-
         // Obtain short-time constant parameters
         getDeviceLocation {
             if (it != null) {
@@ -218,12 +212,20 @@ class DisplayDataFragment : Fragment() {
 
             Log.i(TAG, "New message, result: $notificationResult")
         }
+
+        viewModel.smartWatchCommunicationAPI.changePedometerListener {
+            requireActivity().runOnUiThread {
+                stepsTextView.text = it.toString()
+            }
+
+            Log.i(TAG, "Modified steps textView")
+        }
     }
 
     /**
      * Obtain the location of the device
      */
-    fun getDeviceLocation(callBackOnLocationObtained: (Location?) -> Unit) {
+    private fun getDeviceLocation(callBackOnLocationObtained: (Location?) -> Unit) {
         if (ActivityCompat.checkSelfPermission(
                 this.requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -247,9 +249,6 @@ class DisplayDataFragment : Fragment() {
         // Change button text and state
         connectionButton.isEnabled = true
         connectionButton.text = getString(R.string.disconnect)
-
-        alarmButton.isEnabled = true
-        actionButton.isEnabled = true
         findButton.isEnabled = true
 
         // TODO: Add delay
@@ -318,9 +317,9 @@ class DisplayDataFragment : Fragment() {
     fun onSmartWatchDisconnected() {
         // Change button signature
         connectionButton.text = getString(R.string.connect)
-        alarmButton.isEnabled = false
-        actionButton.isEnabled = false
         findButton.isEnabled = false
+
+        viewModel.smartWatchCommunicationAPI.changePedometerListener(null)
 
         // Delete callbacks
 //        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {

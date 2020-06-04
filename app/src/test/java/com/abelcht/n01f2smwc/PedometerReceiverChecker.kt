@@ -5,44 +5,38 @@ import kotlin.math.pow
 
 class PedometerReceiverChecker {
 
+
+    /**
+     * Analyze the pedometer information and return the steps walked
+     */
     @ExperimentalUnsignedTypes
-    fun analyzePedometerPackage(reassembledPackage: List<Byte>) {
+    fun analyzePedometerPackage(reassembledPackage: List<Byte>): Int {
         // Pedometer package
-        val distance =
-            reassembledPackage[reassembledPackage.size - 4].toUByte().toInt() +
-                    reassembledPackage[reassembledPackage.size - 3].toUByte()
-                        .toInt() *
-                    (2.0.pow(8).toInt()) +
-                    reassembledPackage[reassembledPackage.size - 2].toUByte()
-                        .toInt() *
-                    (2.0.pow(16).toInt())
+        val distance = reassembledPackage[reassembledPackage.size - 5].toUInt() +
+                reassembledPackage[reassembledPackage.size - 4].toUInt() *
+                (2.0.pow(8).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 3].toUInt() *
+                (2.0.pow(16).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 2].toUByte()
+                    .toUInt() *
+                (2.0.pow(16).toUInt())
 
-        val kcal =
-            reassembledPackage[reassembledPackage.size - 8].toUByte().toInt() +
-                    reassembledPackage[reassembledPackage.size - 7].toUByte()
-                        .toInt() *
-                    (2.0.pow(8).toInt()) +
-                    reassembledPackage[reassembledPackage.size - 6].toUByte()
-                        .toInt() *
-                    (2.0.pow(16).toInt()) +
-                    reassembledPackage[reassembledPackage.size - 5].toUByte()
-                        .toInt() *
-                    (2.0.pow(24).toInt())
+        val kcal = reassembledPackage[reassembledPackage.size - 9].toUInt() +
+                reassembledPackage[reassembledPackage.size - 8].toUInt() *
+                (2.0.pow(8).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 7].toUInt() *
+                (2.0.pow(16).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 6].toUInt() *
+                (2.0.pow(24).toUInt())
 
-        val steps =
-            reassembledPackage[reassembledPackage.size - 12].toUByte().toInt() +
-                    reassembledPackage[reassembledPackage.size - 11].toUByte()
-                        .toInt() *
-                    (2.0.pow(8).toInt()) +
-                    reassembledPackage[reassembledPackage.size - 10].toUByte()
-                        .toInt() *
-                    (2.0.pow(16).toInt()) +
-                    reassembledPackage[reassembledPackage.size - 9].toUByte()
-                        .toInt() *
-                    (2.0.pow(24).toInt())
-        println(
-            "distace : $distance kcal: $kcal steps: $steps"
-        )
+        val steps = reassembledPackage[reassembledPackage.size - 13].toUInt() +
+                reassembledPackage[reassembledPackage.size - 12].toUInt() *
+                (2.0.pow(8).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 11].toUInt() *
+                (2.0.pow(16).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 10].toUInt() *
+                (2.0.pow(24).toUInt())
+        return steps.toInt()
     }
 
     @ExperimentalUnsignedTypes

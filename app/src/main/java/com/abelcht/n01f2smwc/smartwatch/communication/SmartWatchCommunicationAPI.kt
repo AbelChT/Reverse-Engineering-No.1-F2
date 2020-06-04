@@ -29,6 +29,42 @@ class SmartWatchCommunicationAPI {
     private var smartWatchWriteCharacteristic: BluetoothGattCharacteristic? = null
     private var smartWatchNotificationCharacteristic: BluetoothGattCharacteristic? = null
 
+    // Pedometer callback
+    private var pedometerCallback: ((Int) -> Unit)? = null
+
+    /**
+     * Analyze the pedometer information and return the steps walked
+     */
+    @ExperimentalUnsignedTypes
+    private fun analyzePedometerPackage(reassembledPackage: List<Byte>): Int {
+        // Pedometer package
+        val distance = reassembledPackage[reassembledPackage.size - 5].toUInt() +
+                reassembledPackage[reassembledPackage.size - 4].toUInt() *
+                (2.0.pow(8).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 3].toUInt() *
+                (2.0.pow(16).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 2].toUByte()
+                    .toUInt() *
+                (2.0.pow(16).toUInt())
+
+        val kcal = reassembledPackage[reassembledPackage.size - 9].toUInt() +
+                reassembledPackage[reassembledPackage.size - 8].toUInt() *
+                (2.0.pow(8).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 7].toUInt() *
+                (2.0.pow(16).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 6].toUInt() *
+                (2.0.pow(24).toUInt())
+
+        val steps = reassembledPackage[reassembledPackage.size - 13].toUInt() +
+                reassembledPackage[reassembledPackage.size - 12].toUInt() *
+                (2.0.pow(8).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 11].toUInt() *
+                (2.0.pow(16).toUInt()) +
+                reassembledPackage[reassembledPackage.size - 10].toUInt() *
+                (2.0.pow(24).toUInt())
+        return steps.toInt()
+    }
+
     // Callback for bluetooth connection
     @ExperimentalUnsignedTypes
     private val bluetoothGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
@@ -102,44 +138,18 @@ class SmartWatchCommunicationAPI {
                 when {
                     reassembledPackage[1] == 0x21.toByte() -> {
                         // Pedometer package
-                        val distance =
-                            reassembledPackage[reassembledPackage.size - 4].toUByte().toInt() +
-                                    reassembledPackage[reassembledPackage.size - 3].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(8).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 2].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(16).toInt())
-
-                        val kcal =
-                            reassembledPackage[reassembledPackage.size - 8].toUByte().toInt() +
-                                    reassembledPackage[reassembledPackage.size - 7].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(8).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 6].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(16).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 5].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(24).toInt())
-
-                        val steps =
-                            reassembledPackage[reassembledPackage.size - 12].toUByte().toInt() +
-                                    reassembledPackage[reassembledPackage.size - 11].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(8).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 10].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(16).toInt()) +
-                                    reassembledPackage[reassembledPackage.size - 9].toUByte()
-                                        .toInt() *
-                                    (2.0.pow(24).toInt())
+                        val steps = analyzePedometerPackage(reassembledPackage)
                         Log.i(
                             logTag,
                             "Pedometer package received and assembled ${bytesToString(
                                 reassembledPackage
-                            )} distace : $distance kcal: $kcal steps: $steps"
+                            )} steps: $steps"
                         )
+
+                        if (pedometerCallback != null) {
+                            pedometerCallback!!.invoke(steps)
+                        }
+
                     }
                     reassembledPackage[1] == 0x0f.toByte() -> {
                         Log.i(
@@ -208,6 +218,7 @@ class SmartWatchCommunicationAPI {
     /**
      * Connect to the SmartWatch
      */
+    @ExperimentalUnsignedTypes
     fun connectToSmartWatch(
         bluetoothDevice: BluetoothDevice,
         context: Context,
@@ -358,18 +369,8 @@ class SmartWatchCommunicationAPI {
     /**
      * Obtain pedometer info
      */
-    fun addPedometerListener(pedometerCallback: (Int) -> Unit): Boolean {
-        // TODO:
-//        if(smartWatchNotificationCharacteristic !=null){
-//            bluetoothGatt!!.setCharacteristicNotification(smartWatchNotificationCharacteristic, false)
-//        }
-
-//        val uuid: UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG)
-//        val descriptor = characteristic.getDescriptor(uuid).apply {
-//            value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-//        }
-//        bluetoothGatt.writeDescriptor(descriptor)
-
-        return true
+    fun changePedometerListener(pedometerCallback: ((Int) -> Unit)?) {
+        this.pedometerCallback = pedometerCallback
     }
+
 }
