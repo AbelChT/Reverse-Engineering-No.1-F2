@@ -18,13 +18,13 @@
         app:layout_gravity="fill_horizontal|center_vertical"
         app:layout_rowWeight="3">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/steps"
             android:textSize="36sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/stepsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,13 +42,13 @@
         app:layout_gravity="fill_horizontal|center_vertical"
         app:layout_rowWeight="1">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/temperature"
             android:textSize="24sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/temperatureTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,13 +66,13 @@
         app:layout_gravity="fill_horizontal|center_vertical"
         app:layout_rowWeight="1">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/uv"
             android:textSize="24sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/uvTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -90,13 +90,13 @@
         app:layout_gravity="fill_horizontal|center_vertical"
         app:layout_rowWeight="1">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pressure"
             android:textSize="24sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pressureTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -114,13 +114,13 @@
         app:layout_gravity="fill_horizontal|center_vertical"
         app:layout_rowWeight="1">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/altitude"
             android:textSize="24sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/altitudeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

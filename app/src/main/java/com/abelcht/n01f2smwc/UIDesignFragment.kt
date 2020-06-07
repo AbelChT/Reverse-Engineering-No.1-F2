@@ -34,7 +34,7 @@ class UIDesignFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.data_display_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_data_display, container, false)
     }
 
     companion object {
