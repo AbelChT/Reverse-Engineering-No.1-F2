@@ -74,8 +74,6 @@ class DisplayDataFragment : Fragment() {
         fusedLocationClient =
             LocationServices.getFusedLocationProviderClient(this.requireActivity())
 
-        // TODO: Add callback to bluetooth disconnect
-
         // To skip filtering based on name and supported feature flags (UUIDs),
         // don't include calls to setNamePattern() and addServiceUuid(),
         // respectively. This example uses Bluetooth.
@@ -327,13 +325,6 @@ class DisplayDataFragment : Fragment() {
         findButton.isEnabled = false
 
         viewModel.smartWatchCommunicationAPI.changePedometerListener(null)
-
-        // Delete callbacks
-//        if (viewModel.smartWatchCommunicationAPI.isConnectedToSmartWatch()) {
-//            requireActivity().unregisterReceiver(timeAndDateChangeBroadcastReceiver)
-//        }
-
-        // TODO: Delete callbacks
     }
 
     @ExperimentalUnsignedTypes
