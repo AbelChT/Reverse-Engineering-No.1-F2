@@ -4,7 +4,6 @@ import android.bluetooth.*
 import android.content.Context
 import android.util.Log
 import com.abelcht.n01f2smwc.smartwatch.communication.packages.*
-import java.lang.Math.pow
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
@@ -38,29 +37,30 @@ class SmartWatchCommunicationAPI {
     @ExperimentalUnsignedTypes
     private fun analyzePedometerPackage(reassembledPackage: List<Byte>): Int {
         // Pedometer package
-        val distance = reassembledPackage[reassembledPackage.size - 5].toUInt() +
-                reassembledPackage[reassembledPackage.size - 4].toUInt() *
+        /*
+        val distance = reassembledPackage[reassembledPackage.size - 5].toUByte().toUInt() +
+                reassembledPackage[reassembledPackage.size - 4].toUByte().toUInt() *
                 (2.0.pow(8).toUInt()) +
-                reassembledPackage[reassembledPackage.size - 3].toUInt() *
+                reassembledPackage[reassembledPackage.size - 3].toUByte().toUInt() *
                 (2.0.pow(16).toUInt()) +
-                reassembledPackage[reassembledPackage.size - 2].toUByte()
-                    .toUInt() *
+                reassembledPackage[reassembledPackage.size - 2].toUByte().toUInt() *
                 (2.0.pow(16).toUInt())
 
-        val kcal = reassembledPackage[reassembledPackage.size - 9].toUInt() +
-                reassembledPackage[reassembledPackage.size - 8].toUInt() *
+        val kcal = reassembledPackage[reassembledPackage.size - 9].toUByte().toUInt() +
+                reassembledPackage[reassembledPackage.size - 8].toUByte().toUInt() *
                 (2.0.pow(8).toUInt()) +
-                reassembledPackage[reassembledPackage.size - 7].toUInt() *
+                reassembledPackage[reassembledPackage.size - 7].toUByte().toUInt() *
                 (2.0.pow(16).toUInt()) +
-                reassembledPackage[reassembledPackage.size - 6].toUInt() *
+                reassembledPackage[reassembledPackage.size - 6].toUByte().toUInt() *
                 (2.0.pow(24).toUInt())
+         */
 
-        val steps = reassembledPackage[reassembledPackage.size - 13].toUInt() +
-                reassembledPackage[reassembledPackage.size - 12].toUInt() *
+        val steps = reassembledPackage[reassembledPackage.size - 13].toUByte().toUInt() +
+                reassembledPackage[reassembledPackage.size - 12].toUByte().toUInt() *
                 (2.0.pow(8).toUInt()) +
-                reassembledPackage[reassembledPackage.size - 11].toUInt() *
+                reassembledPackage[reassembledPackage.size - 11].toUByte().toUInt() *
                 (2.0.pow(16).toUInt()) +
-                reassembledPackage[reassembledPackage.size - 10].toUInt() *
+                reassembledPackage[reassembledPackage.size - 10].toUByte().toUInt() *
                 (2.0.pow(24).toUInt())
         return steps.toInt()
     }

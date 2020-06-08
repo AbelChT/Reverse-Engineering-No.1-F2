@@ -28,7 +28,8 @@ import com.abelcht.n01f2smwc.openwheatherapi.getUV
 import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import kotlinx.android.synthetic.main.display_data_fragment.*
+import kotlinx.android.synthetic.main.fragment_data_display.*
+import kotlinx.android.synthetic.main.fragment_main.*
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
@@ -251,7 +252,6 @@ class DisplayDataFragment : Fragment() {
         connectionButton.text = getString(R.string.disconnect)
         findButton.isEnabled = true
 
-        // TODO: Add delay
         // Change date and time
         val currentDateTime = LocalDateTime.now()
 
@@ -259,6 +259,10 @@ class DisplayDataFragment : Fragment() {
             viewModel.smartWatchCommunicationAPI.changeDateTime(currentDateTime)
 
         Log.i(TAG, "Changed time, result: $notificationResult")
+
+        // If two communications with the Smartwatch are done in a short space of time, it fails in the
+        // last one
+        Thread.sleep(100)
 
         // Change uv pressure temperature and altitude
         val changeUVPressureTemperatureAltitudeResult =
@@ -274,7 +278,10 @@ class DisplayDataFragment : Fragment() {
             "Changed changeUVPressureTemperatureAltitudeResult, result: $changeUVPressureTemperatureAltitudeResult"
         )
 
-        // TODO: Add delay
+        // If two communications with the Smartwatch are done in a short space of time, it fails in the
+        // last one
+        Thread.sleep(100)
+
         // Change alarm
         val alarmManager =
             requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -329,6 +336,7 @@ class DisplayDataFragment : Fragment() {
         // TODO: Delete callbacks
     }
 
+    @ExperimentalUnsignedTypes
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
