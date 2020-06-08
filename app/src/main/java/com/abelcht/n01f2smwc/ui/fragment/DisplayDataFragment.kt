@@ -355,14 +355,17 @@ class DisplayDataFragment : Fragment() {
                             ) {
                                 Log.i(TAG, "Updating UI")
                                 if (it) {
-                                    activity?.runOnUiThread { onSmartWatchConnected() }
+                                    requireActivity().runOnUiThread { onSmartWatchConnected() }
                                 } else {
-                                    activity?.runOnUiThread { onSmartWatchFailConnection() }
+                                    requireActivity().runOnUiThread { onSmartWatchFailConnection() }
                                 }
                             }
 
                         } else println("Unrecognised type of device")
                     }
+                }
+                Activity.RESULT_CANCELED->{
+                    onSmartWatchFailConnection()
                 }
             }
         }
