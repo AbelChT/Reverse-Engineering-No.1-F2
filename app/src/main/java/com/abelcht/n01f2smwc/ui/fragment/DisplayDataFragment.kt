@@ -41,7 +41,7 @@ class DisplayDataFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.display_data_fragment, container, false)
+        return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
     val SELECT_DEVICE_REQUEST_CODE = 43
