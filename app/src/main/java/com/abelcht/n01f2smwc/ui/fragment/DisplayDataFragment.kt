@@ -156,7 +156,7 @@ class DisplayDataFragment : Fragment() {
                 viewModel.longitude = it.longitude
 
                 this.requireActivity().runOnUiThread {
-                    altitudeTextView.text = "%.2f".format(viewModel.altitude)
+                    altitudeTextView.text = "%.2f m".format(viewModel.altitude)
                 }
 
                 getTemperaturePressure(
@@ -167,8 +167,8 @@ class DisplayDataFragment : Fragment() {
                         viewModel.temperature = temperaturePressure.first - 273.16 // Convert to ºC
 
                         this.requireActivity().runOnUiThread {
-                            temperatureTextView.text = "%.2f".format(viewModel.temperature)
-                            pressureTextView.text = "%.2f".format(viewModel.pressure)
+                            temperatureTextView.text = "%.2f ºC".format(viewModel.temperature)
+                            pressureTextView.text = "%.2f hPa".format(viewModel.pressure)
                         }
                     } else
                         Log.i(TAG, "temperaturePressure is null")

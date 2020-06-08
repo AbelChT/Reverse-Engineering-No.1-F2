@@ -191,7 +191,8 @@ class SmartWatchCommunicationAPI {
                     )
 
                     // Send configure command
-                    configureSmartWatch()
+                    val configureResult = configureSmartWatch()
+                    Log.i(logTag, "Configure Smartwatch result $configureResult")
 
                     onConnectionCompleteCallback?.invoke(true)
                 } else {
