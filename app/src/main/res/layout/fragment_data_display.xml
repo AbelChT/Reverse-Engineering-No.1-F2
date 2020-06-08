@@ -16,20 +16,22 @@
         app:layout_columnSpan="2"
         app:layout_columnWeight="2"
         app:layout_gravity="fill_horizontal|center_vertical"
-        app:layout_rowWeight="3">
+        app:layout_rowWeight="2">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/steps"
-            android:textSize="36sp" />
+            android:textAppearance="?attr/textAppearanceHeadline4"
+            />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/stepsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unknownValueUi"
-            android:textSize="36sp" />
+            android:textAppearance="?attr/textAppearanceHeadline3"
+            />
 
     </LinearLayout>
 
@@ -46,14 +48,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/temperature"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline6"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/temperatureTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unknownValueUi"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline5" />
 
     </LinearLayout>
 
@@ -70,14 +72,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/uv"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline6" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/uvTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unknownValueUi"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline5"/>
 
     </LinearLayout>
 
@@ -94,14 +96,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pressure"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline6" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/pressureTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unknownValueUi"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline5" />
 
     </LinearLayout>
 
@@ -118,14 +120,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/altitude"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline6" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/altitudeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/unknownValueUi"
-            android:textSize="24sp" />
+            android:textAppearance="?attr/textAppearanceHeadline5" />
 
     </LinearLayout>
 </androidx.gridlayout.widget.GridLayout>
