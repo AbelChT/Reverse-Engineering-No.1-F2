@@ -30,9 +30,6 @@ class MainActivity : AppCompatActivity() {
     private val newCallBroadcastReceiver = NewCallBroadcastReceiver(this)
     private val newMessageBroadcastReceiver = NewMessageBroadcastReceiver(this)
 
-    // Request ID
-    val REQUEST_ENABLE_BT = 41
-
     /**
      * Require all permissions need by the app
      */
@@ -143,9 +140,5 @@ class MainActivity : AppCompatActivity() {
         newCallBroadcastReceiver.unRegisterReceiver()
         newMessageBroadcastReceiver.unRegisterReceiver()
         super.onDestroy()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
     }
 }
