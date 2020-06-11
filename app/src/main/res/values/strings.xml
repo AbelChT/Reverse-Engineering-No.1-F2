@@ -11,6 +11,7 @@
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
     <string name="find_device">Find device</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="enable_bluetooth_advice">You must enable the bluetooth to connect with the device</string>
+    <string name="enable_location_advice">You must enable the location to obtain meteorological information</string>
 </resources>

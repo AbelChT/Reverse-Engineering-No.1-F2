@@ -1,11 +1,16 @@
 package com.abelcht.n01f2smwc.ui.activity
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,12 +22,16 @@ import com.abelcht.n01f2smwc.broadcast.receiver.NewMessageBroadcastReceiver
 import com.abelcht.n01f2smwc.ui.viewmodel.DisplayDataViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
+
 class MainActivity : AppCompatActivity() {
     private val viewModel: DisplayDataViewModel by viewModels()
     private val TAG = "MainActivity"
     private val timeAndDateChangeBroadcastReceiver = ChangeDateTimeBroadcastReceiver(this)
     private val newCallBroadcastReceiver = NewCallBroadcastReceiver(this)
     private val newMessageBroadcastReceiver = NewMessageBroadcastReceiver(this)
+
+    // Request ID
+    val REQUEST_ENABLE_BT = 41
 
     /**
      * Require all permissions need by the app
@@ -97,6 +106,35 @@ class MainActivity : AppCompatActivity() {
             Log.i(TAG, "newMessageBroadcastReceiver callback")
         }
         newMessageBroadcastReceiver.configureAndRegisterReceiver()
+
+        // Require bluetooth to be enabled
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+
+        if (!bluetoothAdapter.isEnabled) {
+            Toast.makeText(
+                applicationContext,
+                resources.getString(R.string.enable_bluetooth_advice),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        // Check if location is enabled
+        val isGPSEnabled: Boolean = try {
+            val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (e: Exception) {
+            false
+        }
+
+        // Require location to be enabled
+        if (!isGPSEnabled) {
+            Toast.makeText(
+                applicationContext,
+                resources.getString(R.string.enable_location_advice),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
     }
 
     override fun onDestroy() {
@@ -105,5 +143,9 @@ class MainActivity : AppCompatActivity() {
         newCallBroadcastReceiver.unRegisterReceiver()
         newMessageBroadcastReceiver.unRegisterReceiver()
         super.onDestroy()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
