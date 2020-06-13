@@ -13,5 +13,5 @@ var secretOpenWeatherApiKey:String = "00000000000000000000000000000000"
 ```
 
 ## Screen
-![Screenshot](art/screenshot.png=250x)
+![Screenshot](art/screenshot.png | width=100)
 
