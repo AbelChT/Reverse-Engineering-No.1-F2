@@ -1,0 +1,4 @@
+Smartphone->F2: operation: Write request\nhandler: 0x15\nvalue: 0x0001
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Configuration package
+
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Change time package

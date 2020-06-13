@@ -1,0 +1,1 @@
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Some command package

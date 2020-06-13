@@ -1,0 +1,1 @@
+F2->Smartphone: operation: Handle value notification\nhandler: 0x0014\nvalue: Pedometer data

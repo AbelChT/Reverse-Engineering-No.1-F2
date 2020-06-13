@@ -1,0 +1,5 @@
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Some command package (part 1/n) (size: 20 bytes)
+
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Some command package (part m/n) (size: 20 bytes)
+
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Some command package (part n/n) (size: <= 20 bytes)

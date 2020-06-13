@@ -1,0 +1,3 @@
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Enable take picture mode package
+F2->Smartphone: operation: Write command\nhandler: 0x14\nvalue: Take picture notification package
+Smartphone->F2: operation: Write command\nhandler: 0x12\nvalue: Disable take picture mode package

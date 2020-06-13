@@ -1,0 +1,85 @@
+# History 1
+# Steps     kcal       km
+# 22 (0x16) 0.7 (0x07) 0.001 (0x01)
+
+# a921004f140412050100371f0000000a00000002
+# 00000001003e3600000012000000030000000107
+# 3f90030000340100003e0000000108400b070000
+# 610200007c000000010001f0080000050300009d
+# 0000005b
+
+# a921003114041303010740180300000b01000036
+# 000000010641de050000fb010000670000000100
+# 018d080000e3020000970000006f
+
+# a921004014041504010946310400006a0100004a
+# 0000000107477b07000087020000840000000100
+# 50900700008e020000850000000100019d070000
+# 920200008600000010
+
+# a92100311404160301053e57020000ca00000029
+# 00000001073f59050000ce0100005e0000000100
+# 011109000010030000a00000005d
+
+# (a9 21 00) (4f) (14 04 17) (05) (01 00 3e) (19 00 00 00) (08 00 00 00) (01
+# 00 00 00) (01 06 3f) (bc 02 00 00) (ec 00 00 00) (30 00 00 00) (01 05
+# 40) (e6 04 00 00) (a7 01 00 00) (56 00 00 00) (01 0a 41) (44 09 00 00)
+# (21 03 00 00) (a3 00 00 00) (01 00 01) (72 09 00 00) (31 03 00 00) (a6
+# 00 00 00) b3
+
+# (a9 21 00) (22) (14 04 18) date (02 01 00 47)? (0b 00 00 00) (03 00 00 00) (00
+# 00 00 00) 01 00 44 (16 00 00 00) (07 00 00 00) (01 00 00 00) d7
+
+# History 2
+# Steps     kcal       km
+# 10 (0x0a)
+# 12 (0x0c) 0.4 (0x04) 0.001 (0x01)
+# 24 (0x18) 0.8 (0x08) 0.001 (0x01)
+
+# a9 21 00 13 14 04 18 01 01 00 45 0a 00 00 00 03 00 00 00 00
+# 00 00 00 61
+
+# a9 21 00 13 14 04 18 01 01 00 45 0c 00 00 00 04 00 00 00 00
+# 00 00 00 64
+
+# a9 21 00 13 14 04 18 01 01 00 45 18 00 00 00 08 00 00 00 01
+# 00 00 00 75
+
+
+# (a9 21 00) header (13) size (14 04 18) date (01) number of frames (01 00 45)? (18 00 00 00) steps (08 00 00 00) kcal
+# (01 00 00 00) km (75) crc
+
+# Format (header) (size) (date) (number of frames) number of frames * [(?) (steps) (kcal) (km)] (crc)
+
+# Los frames parecen ir en orden cronologico
+
+# Forma de descubrirlo
+# Tras generar varias historias y apuntar los resultados (las de arriba son solo 2, aunque existen más)
+# h1 -> 14 steps, 0.4 km
+# h2 -> 2113 steps, 71.4 kcal, 1.4 km
+# h3 -> 2439 steps, 82.1 kcal, 1.6 km
+
+# La trama ha sido parcialemte identificada (a falta de más capturas para corroborarlo).
+# Analizé primero las tramas intentando buscar igual que siempre algún patrón. Tras esto detecté una trama que empezaba
+# por 0x21 que parecía sospechosa. Tras esto descubrí los diferentes campos de steps, kcal y km.
+# Aunque tras esto diferentes campos quedaban sin tener un valor claro.
+# Tras analizar varias tramas me di cuenta de lo de number of frames y todo cobro más sentido
+# Por otro lado, tanto steps y demás tienen los bytes invertidos porque la arquitectura es little-endian
+# y los valores se representan como un int de 32 bits
+
+# Info obtenida tras hacer el programa
+#
+# Parece que hace un historial de los mensajes que no se han enviado
+
+# Al principio de la comunicación el posómetro se envía cada mucho tiempo, pero después ya después el ritmo es más bajo
+
+Pedometer date:  [20, 4, 25]
+Pedometer info: steps  [98, 0, 0, 0]  kcal  [33, 0, 0, 0]  km  [6, 0, 0]  unknown value  [1, 0, 53]
+Pedometer info: steps  [113, 0, 0, 0]  kcal  [38, 0, 0, 0]  km  [7, 0, 0]  unknown value  [1, 0, 53]
+Pedometer date:  [20, 4, 25]
+Pedometer info: steps  [98, 0, 0, 0]  kcal  [33, 0, 0, 0]  km  [6, 0, 0]  unknown value  [1, 0, 53]
+Pedometer info: steps  [113, 0, 0, 0]  kcal  [38, 0, 0, 0]  km  [7, 0, 0]  unknown value  [1, 0, 53]
+Pedometer date:  [20, 4, 25]
+Pedometer info: steps  [98, 0, 0, 0]  kcal  [33, 0, 0, 0]  km  [6, 0, 0]  unknown value  [1, 0, 53]
+Pedometer info: steps  [113, 0, 0, 0]  kcal  [38, 0, 0, 0]  km  [7, 0, 0]  unknown value  [1, 0, 53]
+
