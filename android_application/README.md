@@ -14,4 +14,5 @@ var secretOpenWeatherApiKey:String = "00000000000000000000000000000000"
 
 ## Screen
 ![Screenshot](art/screenshot.png = 250x)
+<img src="art/screenshot.png" width="48">
 
