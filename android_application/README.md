@@ -1,4 +1,4 @@
-# Remplace mobile Application
+# Companion Android Application
 ## Description
 This application is intended to replace the official application for communication with this Smartwatch.
 
@@ -11,3 +11,6 @@ package com.abelcht.n01f2smwc.config
 
 var secretOpenWeatherApiKey:String = "00000000000000000000000000000000"
 ```
+
+## Screen
+
